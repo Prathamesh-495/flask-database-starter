@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book API Frontend</title>
+    <style>
+        body { font-family: Arial; margin: 40px; background: #f4f6f8; }
+        h1 { color: #333; }
+        button { padding: 6px 12px; margin: 5px; cursor: pointer; }
+        select { padding: 6px; }
+        ul { padding: 0; }
+        li {
+            list-style: none;
+            background: white;
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<h1>📚 Book List (Fetch API)</h1>
+
+<!-- Sorting -->
+<label>Sort by:</label>
+<select id="sort">
+    <option value="id">ID</option>
+    <option value="title">Title</option>
+    <option value="author">Author</option>
+    <option value="year">Year</option>
+</select>
+
+<select id="order">
+    <option value="asc">ASC</option>
+    <option value="desc">DESC</option>
+</select>
+
+<button onclick="loadBooks()">Apply</button>
+
+<!-- Book List -->
+<ul id="books"></ul>
+
+<!-- Pagination -->
+<button onclick="prevPage()">⬅ Prev</button>
+<button onclick="nextPage()">Next ➡</button>
+
+<script>
+let page = 1;
+const perPage = 2;
+
+function loadBooks() {
+    const sort = document.getElementById("sort").value;
+    const order = document.getElementById("order").value;
+
+    fetch(`/api/books?page=${page}&per_page=${perPage}&sort=${sort}&order=${order}`)
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById("books");
+            list.innerHTML = "";
+
+            data.books.forEach(book => {
+                list.innerHTML += `
+                    <li>
+                        <strong>${book.title}</strong><br>
+                        Author: ${book.author}<br>
+                        Year: ${book.year || "N/A"}
+                    </li>
+                `;
+            });
+        });
+}
+
+function nextPage() {
+    page++;
+    loadBooks();
+}
+
+function prevPage() {
+    if (page > 1) page--;
+    loadBooks();
+}
+
+// Initial load
+loadBooks();
+</script>
+
+</body>
+</html>
