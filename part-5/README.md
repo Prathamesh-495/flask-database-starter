@@ -158,3 +158,10 @@ You've completed all 5 parts of Flask Database learning!
 3. **Part 3:** SQLAlchemy ORM
 4. **Part 4:** REST API
 5. **Part 5:** Production databases
+
+
+##query performance between SQLite and PostgreSQL
+| Database   | Avg Query Time |
+| ---------- | -------------- |
+| SQLite     | ~12–20 ms      |
+| PostgreSQL | ~3–7 ms        |
