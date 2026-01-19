@@ -1,162 +1,443 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Product Inventory</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Inventory</title>
 
-    <style>
-        body {
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: #f4f6f8;
-            margin: 0;
-            padding: 20px;
-        }
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#0f172a;
+      --card: rgba(255,255,255,0.06);
+      --card2: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.12);
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --accent:#22c55e;
+      --blue:#60a5fa;
+      --danger:#ef4444;
+      --warning:#f59e0b;
+      --shadow: 0 12px 30px rgba(0,0,0,0.35);
+      --radius: 18px;
+    }
 
-        .container {
-            max-width: 1000px;
-            margin: auto;
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-        }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color: var(--text);
+      background:
+        radial-gradient(1000px 500px at 10% 0%, rgba(96,165,250,0.25), transparent 55%),
+        radial-gradient(900px 500px at 100% 20%, rgba(34,197,94,0.18), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+      padding: 22px;
+    }
 
-        h1 {
-            margin-top: 0;
-            color: #333;
-        }
+    .wrap{
+      max-width: 1100px;
+      margin: 0 auto;
+    }
 
-        .top-bar {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+    /* Header */
+    .header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
 
-        .top-bar form input {
-            padding: 8px 12px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
+    .title h1{
+      margin:0;
+      font-size: 28px;
+      letter-spacing: 0.2px;
+    }
 
-        .btn {
-            padding: 8px 16px;
-            border-radius: 6px;
-            border: none;
-            text-decoration: none;
-            font-size: 14px;
-            cursor: pointer;
-        }
+    .title p{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
 
-        .btn-primary {
-            background: #4CAF50;
-            color: white;
-        }
+    .actions{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
 
-        .btn-danger {
-            background: #e74c3c;
-            color: white;
-        }
+    .btn{
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 14px;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      cursor:pointer;
+      transition: transform 0.12s ease, background 0.12s ease, border 0.12s ease;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+      font-weight: 600;
+      font-size: 14px;
+      user-select:none;
+    }
 
-        .btn-edit {
-            background: #3498db;
-            color: white;
-        }
+    .btn:hover{
+      transform: translateY(-1px);
+      background: var(--card2);
+      border-color: rgba(255,255,255,0.18);
+    }
 
-        .summary {
-            margin-bottom: 15px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
+    .btn-primary{
+      background: rgba(34,197,94,0.16);
+      border-color: rgba(34,197,94,0.35);
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+    .btn-primary:hover{
+      background: rgba(34,197,94,0.22);
+      border-color: rgba(34,197,94,0.55);
+    }
 
-        th, td {
-            padding: 12px;
-            text-align: center;
-        }
+    .btn-ghost{
+      background: transparent;
+      box-shadow:none;
+    }
 
-        th {
-            background: #f1f3f5;
-            color: #555;
-        }
+    /* Cards */
+    .grid{
+      display:grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
 
-        tr:nth-child(even) {
-            background: #fafafa;
-        }
+    .card{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
 
-        @media (max-width: 600px) {
-            table, thead, tbody, th, td, tr {
-                display: block;
-            }
+    .stat{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
 
-            th {
-                display: none;
-            }
+    .stat .left h3{
+      margin:0;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 600;
+    }
 
-            td {
-                text-align: right;
-                position: relative;
-                padding-left: 50%;
-            }
+    .stat .left .value{
+      margin-top: 6px;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
 
-            td::before {
-                content: attr(data-label);
-                position: absolute;
-                left: 15px;
-                font-weight: bold;
-            }
-        }
-    </style>
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .dot{
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.12);
+    }
+
+    /* Search */
+    .search{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap: wrap;
+    }
+
+    .input{
+      flex: 1;
+      min-width: 220px;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 12px;
+    }
+
+    .input span{
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .input input{
+      width: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .hint{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* Table */
+    .table-card{
+      padding: 0;
+      overflow:hidden;
+    }
+
+    .table-head{
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 10px;
+    }
+
+    .table-head h2{
+      margin:0;
+      font-size: 16px;
+    }
+
+    .count{
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    table{
+      width:100%;
+      border-collapse: collapse;
+    }
+
+    th, td{
+      padding: 14px 16px;
+      text-align:left;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 14px;
+    }
+
+    th{
+      color: var(--muted);
+      font-weight: 700;
+      background: rgba(255,255,255,0.03);
+    }
+
+    tr:hover td{
+      background: rgba(255,255,255,0.03);
+    }
+
+    .price{
+      font-weight: 800;
+      color: #a7f3d0;
+    }
+
+    .qty{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      font-weight: 700;
+    }
+
+    .pill{
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .row-actions{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-edit{
+      background: rgba(96,165,250,0.16);
+      border-color: rgba(96,165,250,0.35);
+    }
+
+    .btn-edit:hover{
+      background: rgba(96,165,250,0.22);
+      border-color: rgba(96,165,250,0.55);
+    }
+
+    .btn-danger{
+      background: rgba(239,68,68,0.16);
+      border-color: rgba(239,68,68,0.35);
+    }
+
+    .btn-danger:hover{
+      background: rgba(239,68,68,0.22);
+      border-color: rgba(239,68,68,0.55);
+    }
+
+    .empty{
+      padding: 24px 16px;
+      color: var(--muted);
+      text-align:center;
+    }
+
+    /* Mobile */
+    @media (max-width: 860px){
+      .grid{ grid-template-columns: 1fr; }
+      .header{ flex-direction: column; align-items: stretch; }
+      .actions{ justify-content:flex-start; }
+    }
+
+    /* Responsive table to cards */
+    @media (max-width: 680px){
+      table, thead, tbody, th, td, tr { display:block; }
+      thead{ display:none; }
+      tr{
+        padding: 10px 12px;
+        margin: 12px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: rgba(255,255,255,0.04);
+      }
+      td{
+        border:none;
+        padding: 8px 0;
+      }
+      td::before{
+        content: attr(data-label);
+        display:block;
+        color: var(--muted);
+        font-size: 12px;
+        margin-bottom: 2px;
+        font-weight: 700;
+      }
+      .table-head{
+        flex-direction: column;
+        align-items:flex-start;
+      }
+      .row-actions{ margin-top: 6px; }
+    }
+  </style>
 </head>
 <body>
+  <div class="wrap">
 
-<div class="container">
-    <h1>📦 Product Inventory</h1>
+    <div class="header">
+      <div class="title">
+        <h1>📦 Product Inventory</h1>
+        <p>Manage your stock, pricing and products in one place.</p>
+      </div>
 
-    <div class="top-bar">
-        <form method="GET">
-            <input type="text" name="search" placeholder="Search product">
-            <button class="btn btn-primary">Search</button>
+      <div class="actions">
+        <a class="btn btn-primary" href="{{ url_for('add_product') }}">➕ Add Product</a>
+        <a class="btn btn-ghost" href="{{ url_for('index') }}">🔄 Refresh</a>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="stat">
+          <div class="left">
+            <h3>Total Inventory Value</h3>
+            <div class="value">₹ {{ "%.2f"|format(total_value) }}</div>
+          </div>
+          <div class="badge">
+            <span class="dot"></span>
+            Live
+          </div>
+        </div>
+        <div class="hint">Total value = Σ(quantity × price)</div>
+      </div>
+
+      <div class="card">
+        <form class="search" method="GET" action="{{ url_for('index') }}">
+          <div class="input">
+            <span>🔎</span>
+            <input type="text" name="search" placeholder="Search product name..." value="{{ request.args.get('search','') }}">
+          </div>
+          <button class="btn" type="submit">Search</button>
+          <a class="btn btn-ghost" href="{{ url_for('index') }}">Clear</a>
         </form>
-
-        <a href="/add" class="btn btn-primary">+ Add Product</a>
+        <div class="hint">Tip: search is case-sensitive (can be improved later).</div>
+      </div>
     </div>
 
-    <div class="summary">
-        Total Inventory Value: ₹ {{ "%.2f"|format(total_value) }}
-    </div>
+    <div class="card table-card">
+      <div class="table-head">
+        <h2>All Products</h2>
+        <div class="count">{{ products|length }} items</div>
+      </div>
 
-    <table>
-        <tr>
-            <th>ID</th>
+      {% if products %}
+      <table>
+        <thead>
+          <tr>
+            <th style="width:70px;">ID</th>
             <th>Name</th>
-            <th>Qty</th>
-            <th>Price</th>
-            <th>Actions</th>
-        </tr>
+            <th style="width:140px;">Quantity</th>
+            <th style="width:160px;">Price</th>
+            <th style="width:220px;">Actions</th>
+          </tr>
+        </thead>
 
-        {% for p in products %}
-        <tr>
-            <td data-label="ID">{{ p.id }}</td>
-            <td data-label="Name">{{ p.name }}</td>
-            <td data-label="Quantity">{{ p.quantity }}</td>
-            <td data-label="Price">₹ {{ p.price }}</td>
-            <td data-label="Actions">
-                <a href="/edit/{{ p.id }}" class="btn btn-edit">Edit</a>
-                <a href="/delete/{{ p.id }}" class="btn btn-danger"
-                   onclick="return confirm('Delete this product?')">Delete</a>
+        <tbody>
+          {% for p in products %}
+          <tr>
+            <td data-label="ID"><span class="pill">#{{ p.id }}</span></td>
+            <td data-label="Name" style="font-weight:800;">{{ p.name }}</td>
+            <td data-label="Quantity">
+              <span class="qty">📦 {{ p.quantity }} <span class="pill">units</span></span>
             </td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
+            <td data-label="Price" class="price">₹ {{ "%.2f"|format(p.price) }}</td>
+            <td data-label="Actions">
+              <div class="row-actions">
+                <a class="btn btn-edit" href="{{ url_for('edit_product', id=p.id) }}">✏️ Edit</a>
+                <a class="btn btn-danger"
+                   href="{{ url_for('delete_product', id=p.id) }}"
+                   onclick="return confirm('Delete {{ p.name }} ?')">🗑 Delete</a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+        <div class="empty">
+          <h3 style="margin:0 0 6px;">No products found</h3>
+          <p style="margin:0;">Click <b>Add Product</b> to start your inventory.</p>
+        </div>
+      {% endif %}
+    </div>
 
+  </div>
 </body>
 </html>

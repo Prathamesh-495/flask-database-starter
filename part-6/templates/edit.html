@@ -1,66 +1,160 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Edit Product</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Product</title>
 
-    <style>
-        body {
-            font-family: Arial;
-            background: #f4f6f8;
-            padding: 20px;
-        }
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#0f172a;
+      --card: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.12);
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --blue:#60a5fa;
+      --shadow: 0 12px 30px rgba(0,0,0,0.35);
+      --radius: 18px;
+    }
 
-        .card {
-            max-width: 400px;
-            margin: auto;
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-        }
+    *{ box-sizing:border-box; }
 
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 10% 0%, rgba(96,165,250,0.25), transparent 55%),
+        radial-gradient(900px 500px at 100% 20%, rgba(34,197,94,0.18), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+      padding: 22px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
 
-        button {
-            width: 100%;
-            padding: 10px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-        }
+    .card{
+      width: 100%;
+      max-width: 520px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
 
-        a {
-            display: block;
-            text-align: center;
-            margin-top: 15px;
-            color: #555;
-            text-decoration: none;
-        }
-    </style>
+    .head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    h1{
+      margin:0;
+      font-size: 20px;
+    }
+
+    .back{
+      text-decoration:none;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .back:hover{ color: var(--text); }
+
+    label{
+      display:block;
+      margin: 12px 0 6px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    input{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      outline: none;
+      font-size: 14px;
+    }
+
+    input:focus{
+      border-color: rgba(96,165,250,0.55);
+      box-shadow: 0 0 0 4px rgba(96,165,250,0.12);
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn{
+      width:100%;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(96,165,250,0.35);
+      background: rgba(96,165,250,0.16);
+      color: var(--text);
+      font-weight: 800;
+      font-size: 14px;
+      cursor:pointer;
+      transition: transform 0.12s ease, background 0.12s ease;
+    }
+
+    .btn:hover{
+      transform: translateY(-1px);
+      background: rgba(96,165,250,0.22);
+    }
+
+    .hint{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align:center;
+    }
+
+    @media (max-width: 520px){
+      .row{ grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-
-<div class="card">
-    <h2>Edit Product</h2>
+  <div class="card">
+    <div class="head">
+      <h1>✏️ Edit Product</h1>
+      <a class="back" href="{{ url_for('index') }}">← Back</a>
+    </div>
 
     <form method="POST">
-        <input type="text" name="name" value="{{ product.name }}" required>
-        <input type="number" name="quantity" value="{{ product.quantity }}" required>
-        <input type="number" step="0.01" name="price" value="{{ product.price }}" required>
-        <button type="submit">Update Product</button>
+      <label>Product Name</label>
+      <input type="text" name="name" value="{{ product.name }}" required />
+
+      <div class="row">
+        <div>
+          <label>Quantity</label>
+          <input type="number" name="quantity" min="0" value="{{ product.quantity }}" required />
+        </div>
+        <div>
+          <label>Price (₹)</label>
+          <input type="number" step="0.01" min="0" name="price" value="{{ product.price }}" required />
+        </div>
+      </div>
+
+      <button class="btn" type="submit">Update Product</button>
     </form>
 
-    <a href="/">← Back to Inventory</a>
-</div>
-
+    <div class="hint">Your changes will be saved to the database.</div>
+  </div>
 </body>
 </html>
