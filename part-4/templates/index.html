@@ -1,89 +1,174 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Book API Frontend</title>
-    <style>
-        body { font-family: Arial; margin: 40px; background: #f4f6f8; }
-        h1 { color: #333; }
-        button { padding: 6px 12px; margin: 5px; cursor: pointer; }
-        select { padding: 6px; }
-        ul { padding: 0; }
-        li {
-            list-style: none;
-            background: white;
-            margin: 8px 0;
-            padding: 12px;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Dashboard</title>
+  <style>
+    *{box-sizing:border-box;font-family:system-ui}
+    body{margin:0;background:linear-gradient(135deg,#eef2ff,#f8fafc);padding:18px}
+    .wrap{max-width:950px;margin:auto}
+    .top{
+      background:rgba(255,255,255,.75);backdrop-filter:blur(10px);
+      border:1px solid rgba(0,0,0,.06);border-radius:18px;
+      padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.08);
+      display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between
+    }
+    .title{display:flex;align-items:center;gap:10px}
+    .logo{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,#6366f1,#22c55e);display:grid;place-items:center;color:#fff;font-weight:800}
+    h2{margin:0;font-size:18px}
+    .sub{font-size:12px;color:#6b7280}
+    .ctrl{display:flex;gap:8px;flex-wrap:wrap}
+    input,select,button{
+      padding:10px 12px;border-radius:14px;border:1px solid #e5e7eb;
+      background:#fff;font-size:14px;outline:none
+    }
+    button{
+      border:none;color:#fff;cursor:pointer;font-weight:700;
+      background:linear-gradient(135deg,#111827,#374151);
+      box-shadow:0 8px 18px rgba(17,24,39,.25);
+      transition:.15s
+    }
+    button:hover{transform:translateY(-1px)}
+    button.red{background:linear-gradient(135deg,#dc2626,#991b1b)}
+    button.blue{background:linear-gradient(135deg,#2563eb,#1d4ed8)}
+    button.gray{background:linear-gradient(135deg,#6b7280,#374151)}
+    .grid{margin-top:14px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .card{
+      background:#fff;border:1px solid rgba(0,0,0,.06);
+      border-radius:18px;padding:14px;
+      box-shadow:0 10px 24px rgba(0,0,0,.08);
+      transition:.15s
+    }
+    .card:hover{transform:translateY(-2px)}
+    .t{font-weight:800;font-size:15px;color:#111827}
+    .m{margin-top:8px;font-size:13px;color:#4b5563;line-height:1.5}
+    .tag{display:inline-block;margin-top:10px;padding:5px 10px;border-radius:999px;background:#eef2ff;color:#4338ca;font-size:12px;font-weight:800}
+    .row{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+    .pg{
+      margin-top:14px;background:rgba(255,255,255,.85);
+      border:1px solid rgba(0,0,0,.06);border-radius:18px;
+      padding:12px;box-shadow:0 10px 24px rgba(0,0,0,.08);
+      display:flex;justify-content:space-between;align-items:center;gap:10px
+    }
+    @media(max-width:700px){.grid{grid-template-columns:1fr}}
+  </style>
 </head>
+
 <body>
+<div class="wrap">
 
-<h1>📚 Book List (Fetch API)</h1>
+  <div class="top">
+    <div class="title">
+      <div class="logo">📚</div>
+      <div>
+        <h2>Book Dashboard</h2>
+        <div class="sub">Add • Edit • Delete • Pagination • Sorting</div>
+      </div>
+    </div>
 
-<!-- Sorting -->
-<label>Sort by:</label>
-<select id="sort">
-    <option value="id">ID</option>
-    <option value="title">Title</option>
-    <option value="author">Author</option>
-    <option value="year">Year</option>
-</select>
+    <div class="ctrl">
+      <select id="sort">
+        <option value="id">ID</option>
+        <option value="title">Title</option>
+        <option value="author">Author</option>
+        <option value="year">Year</option>
+      </select>
+      <select id="order">
+        <option value="asc">ASC</option>
+        <option value="desc">DESC</option>
+      </select>
+      <button class="gray" onclick="page=1;load()">Apply</button>
+    </div>
+  </div>
 
-<select id="order">
-    <option value="asc">ASC</option>
-    <option value="desc">DESC</option>
-</select>
+  <!-- Add Book Form -->
+  <div class="top" style="margin-top:14px">
+    <input id="title" placeholder="Title" />
+    <input id="author" placeholder="Author" />
+    <input id="year" placeholder="Year" type="number" />
+    <button class="blue" onclick="addBook()">➕ Add</button>
+  </div>
 
-<button onclick="loadBooks()">Apply</button>
+  <div id="books" class="grid"></div>
 
-<!-- Book List -->
-<ul id="books"></ul>
+  <div class="pg">
+    <button id="prev" onclick="page--;load()">⬅ Prev</button>
+    <b id="info">Page 1</b>
+    <button id="next" onclick="page++;load()">Next ➡</button>
+  </div>
 
-<!-- Pagination -->
-<button onclick="prevPage()">⬅ Prev</button>
-<button onclick="nextPage()">Next ➡</button>
+</div>
 
 <script>
-let page = 1;
-const perPage = 2;
+  let page=1,pages=1,perPage=6;
+  const $=x=>document.getElementById(x);
 
-function loadBooks() {
-    const sort = document.getElementById("sort").value;
-    const order = document.getElementById("order").value;
+  async function load(){
+    const res=await fetch(`/api/books?page=${page}&per_page=${perPage}&sort=${$("sort").value}&order=${$("order").value}`);
+    const d=await res.json(); pages=d.pages;
 
-    fetch(`/api/books?page=${page}&per_page=${perPage}&sort=${sort}&order=${order}`)
-        .then(res => res.json())
-        .then(data => {
-            const list = document.getElementById("books");
-            list.innerHTML = "";
+    $("info").innerText=`Page ${d.page} / ${d.pages} • Total ${d.total}`;
+    $("prev").disabled=page<=1; $("next").disabled=page>=pages;
 
-            data.books.forEach(book => {
-                list.innerHTML += `
-                    <li>
-                        <strong>${book.title}</strong><br>
-                        Author: ${book.author}<br>
-                        Year: ${book.year || "N/A"}
-                    </li>
-                `;
-            });
-        });
-}
+    $("books").innerHTML=d.books.map(b=>`
+      <div class="card">
+        <div class="t">${b.title}</div>
+        <div class="m">👤 ${b.author}<br>📅 ${b.year||"N/A"}</div>
+        <div class="tag">ID: ${b.id}</div>
 
-function nextPage() {
-    page++;
-    loadBooks();
-}
+        <div class="row">
+          <button class="blue" onclick="editBook(${b.id},'${escapeStr(b.title)}','${escapeStr(b.author)}','${b.year||""}')">✏ Edit</button>
+          <button class="red" onclick="deleteBook(${b.id})">🗑 Delete</button>
+        </div>
+      </div>`).join("");
+  }
 
-function prevPage() {
-    if (page > 1) page--;
-    loadBooks();
-}
+  function escapeStr(s){ return (s||"").replace(/'/g,"\\'"); }
 
-// Initial load
-loadBooks();
+  async function addBook(){
+    const title=$("title").value.trim();
+    const author=$("author").value.trim();
+    const year=$("year").value ? parseInt($("year").value) : null;
+
+    if(!title || !author) return alert("Title & Author required!");
+
+    await fetch("/api/books",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({title,author,year})
+    });
+
+    $("title").value=""; $("author").value=""; $("year").value="";
+    page=1; load();
+  }
+
+  async function editBook(id,title,author,year){
+    const newTitle=prompt("Edit Title:",title);
+    if(newTitle===null) return;
+
+    const newAuthor=prompt("Edit Author:",author);
+    if(newAuthor===null) return;
+
+    const newYear=prompt("Edit Year:",year);
+
+    await fetch(`/api/books/${id}`,{
+      method:"PUT",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({title:newTitle,author:newAuthor,year:newYear?parseInt(newYear):null})
+    });
+
+    load();
+  }
+
+  async function deleteBook(id){
+    if(!confirm("Delete this book?")) return;
+
+    await fetch(`/api/books/${id}`,{method:"DELETE"});
+    load();
+  }
+
+  load();
 </script>
-
 </body>
 </html>
